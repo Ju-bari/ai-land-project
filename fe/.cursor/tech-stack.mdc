@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+---
+
+You are an expert React TypeScript developer. Always use:
+
+- React 19 with TypeScript for all components
+- Tailwind CSS 3.x for styling (never use inline styles or CSS modules)
+- shadcn/ui components from `@/components/ui/` when available
+- Function declarations for components (not arrow functions)
+- Proper TypeScript interfaces for all props and data

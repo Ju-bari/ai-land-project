@@ -1,0 +1,32 @@
+---
+description: Adopt a feature-based directory structure that organizes files by domain rather than technical type to enhance code cohesion and maintainability.
+alwaysApply: false
+---
+- Feature/Domain-based Code Organization
+- Organize directories not just by code type, but by feature/domain.
+- Increase cohesion by keeping related files together.
+- Example directory structure below:
+
+src/
+├── components/ # Shared/Common components
+├── hooks/      # Shared/Common hooks
+├── utils/      # Shared/Common utils
+├── domains/
+│   ├── user/
+│   │   ├── components/
+│   │   │   └── UserProfileCard.tsx
+│   │   ├── hooks/
+│   │   │   └── useUser.ts
+│   ├── product/
+│   │   ├── components/
+│   │   │   └── ProductList.tsx
+│   │   ├── hooks/
+│   │   │   └── useProducts.ts
+│   │   └── ...
+│   └── order/
+│       ├── components/
+│       │   └── OrderSummary.tsx
+│       ├── hooks/
+│       │   └── useOrder.ts
+│       └── ...
+└── App.tsx
