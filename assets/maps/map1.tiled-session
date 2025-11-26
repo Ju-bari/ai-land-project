@@ -3,11 +3,23 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "map1.tmx",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
+        "Serene_Village_32x32.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "map1.tmx": {
+            "scale": 1.08,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 799.9999999999999,
+                "y": 401.38888888888886
+            }
+        }
     },
     "last.exportedFilePath": "/Users/jh/Desktop/proj/ai-land/fe/src/assets/maps",
     "last.imagePath": "/Users/jh/Desktop/proj/ai-land/assets/maps/Serene_Village_revamped_v1/SERENE_VILLAGE_REVAMPED",
@@ -16,9 +28,13 @@
     "map.lastUsedFormat": "tmx",
     "map.width": 50,
     "openFiles": [
+        "map1.tmx",
+        "Serene_Village_32x32.tsx"
     ],
     "project": "map1.tiled-project",
     "recentFiles": [
+        "Serene_Village_32x32.tsx",
+        "map1.tmx"
     ],
     "tileset.lastUsedFormat": "tsx"
 }
