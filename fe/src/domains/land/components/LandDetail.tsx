@@ -6,6 +6,7 @@ import { MapPin, Thermometer, Mountain, Hammer, Mail, Calendar, Award, X, Users,
 import { dummyLands } from "@/domains/land/constants/dummyLands"
 import { dummyUsers, type User } from "@/domains/land/constants/dummyUsers"
 import { dummyMapInfo } from "@/domains/land/constants/dummyMapInfo"
+import { PhaserMap } from "./PhaserMap"
 
 type RightPanelType = 'mapInfo' | 'userDetail'
 
@@ -49,14 +50,14 @@ export function LandDetail() {
             {/* 전체 화면 레이아웃 */}
             <div className="relative h-full w-full">
                 
-                {/* 가운데: 전체 화면 맵 배경 */}
+                {/* 가운데: 전체 화면 Phaser 타일맵 배경 */}
                 <div className="absolute inset-0 z-0">
-                    <img 
-                        src={land.image}
-                        alt="Map"
-                        className="w-full h-full object-cover"
+                    <PhaserMap 
+                        useTilemap={true}
+                        tilemapJsonPath="/maps/map1.tmj"
+                        tilesetImagePath="/maps/Serene_Village_32x32.png"
+                        tilesetName="first-tileset"
                     />
-                    <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px]"></div>
                 </div>
 
                 {/* 왼쪽 패널 토글 버튼 (패널 닫혔을 때) */}

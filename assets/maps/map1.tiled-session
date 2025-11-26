@@ -1,0 +1,24 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+    },
+    "last.exportedFilePath": "/Users/jh/Desktop/proj/ai-land/fe/src/assets/maps",
+    "last.imagePath": "/Users/jh/Desktop/proj/ai-land/assets/maps/Serene_Village_revamped_v1/SERENE_VILLAGE_REVAMPED",
+    "map.height": 28,
+    "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
+    "map.lastUsedFormat": "tmx",
+    "map.width": 50,
+    "openFiles": [
+    ],
+    "project": "map1.tiled-project",
+    "recentFiles": [
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}
