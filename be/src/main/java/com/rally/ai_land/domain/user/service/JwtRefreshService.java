@@ -23,8 +23,7 @@ public class JwtRefreshService {
     @Transactional
     public JwtResponse cookie2Header(
             HttpServletRequest request,
-            HttpServletResponse response
-    ) {
+            HttpServletResponse response) {
 
         // 쿠키 리스트
         Cookie[] cookies = request.getCookies();

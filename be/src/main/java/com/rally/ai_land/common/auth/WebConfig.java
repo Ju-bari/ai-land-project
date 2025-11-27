@@ -1,4 +1,4 @@
-package com.rally.ai_land.common.config;
+package com.rally.ai_land.common.auth;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

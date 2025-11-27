@@ -1,5 +1,6 @@
 package com.rally.ai_land.common.auth;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -13,29 +14,36 @@ import java.util.Date;
 
 public class JwtUtil {
 
-    private static final Long accessTokenExpiresIn = 3600L * 1000;
-    private static final Long refreshTokenExpiresIn = 604800L * 1000;
-    private static SecretKey secretKey;
+    // TODO: 컴포넌트화
+    private static final SecretKey secretKey;
+    private static final Long accessTokenExpiresIn;
+    private static final Long refreshTokenExpiresIn;
 
-    @Value("${jwt.secretkey}")
-    private String secretKeyString;
+    static {
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .load();
 
-    @PostConstruct
-    public void init() {
+        String secretKeyString = dotenv.get("JWT_SECRET_KEY");
         secretKey = new SecretKeySpec(
                 secretKeyString.getBytes(StandardCharsets.UTF_8),
                 Jwts.SIG.HS256.key().build().getAlgorithm()
         );
+
+        accessTokenExpiresIn = Long.parseLong(dotenv.get("JWT_ACCESS_TOKEN_EXPIRES_IN"));
+        refreshTokenExpiresIn = Long.parseLong(dotenv.get("JWT_REFRESH_TOKEN_EXPIRES_IN"));
     }
 
     // JWT 클레임 username 파싱
     public static String getUsername(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("sub", String.class);
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("sub",
+                String.class);
     }
 
     // JWT 클레임 role 파싱
     public static String getRole(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role",
+                String.class);
     }
 
     // JWT 유효 여부 (위조, 시간, Access/Refresh 여부)
@@ -48,10 +56,13 @@ public class JwtUtil {
                     .getPayload();
 
             String type = claims.get("type", String.class);
-            if (type == null) return false;
+            if (type == null)
+                return false;
 
-            if (isAccess && !type.equals("access")) return false;
-            if (!isAccess && !type.equals("refresh")) return false;
+            if (isAccess && !type.equals("access"))
+                return false;
+            if (!isAccess && !type.equals("refresh"))
+                return false;
 
             return true;
 

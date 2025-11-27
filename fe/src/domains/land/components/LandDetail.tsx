@@ -158,7 +158,8 @@ export function LandDetail() {
                         </CardContent>
                         <div className="flex-shrink-0 p-4 border-t border-slate-700">
                             <Button 
-                                className="w-full bg-slate-800 text-white border border-slate-700 hover:bg-red-600"
+                                variant="outline"
+                                className="w-full bg-slate-800 text-white border-slate-700 hover:bg-red-600 hover:border-red-600 hover:text-white transition-all"
                                 onClick={() => navigate('/lands')}
                             >
                                 <LogOut className="w-4 h-4 mr-2" />
@@ -347,7 +348,10 @@ export function LandDetail() {
                                         <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                                             메시지 보내기
                                         </Button>
-                                        <Button className="w-full bg-slate-800 text-white border border-slate-700 hover:bg-slate-700">
+                                        <Button 
+                                            variant="outline"
+                                            className="w-full bg-slate-800 text-white border-slate-700 hover:bg-slate-700 hover:text-white"
+                                        >
                                             친구 추가
                                         </Button>
                                     </div>

@@ -4,6 +4,7 @@ import com.rally.ai_land.domain.user.service.JwtRefreshService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -12,20 +13,19 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-@Qualifier("LoginSuccessHandler")
-public class LoginSuccessHandler implements AuthenticationSuccessHandler {
+@Qualifier("CustomLoginSuccessHandler")
+@RequiredArgsConstructor
+public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtRefreshService jwtRefreshService;
 
-    public LoginSuccessHandler(JwtRefreshService jwtRefreshService) {
-        this.jwtRefreshService = jwtRefreshService;
-    }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws IOException, ServletException {
 
         // username, role
-        String username =  authentication.getName();
+        String username = authentication.getName();
         String role = authentication.getAuthorities().iterator().next().getAuthority();
 
         // JWT(Access/Refresh) 발급

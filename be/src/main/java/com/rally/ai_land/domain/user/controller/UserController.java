@@ -38,8 +38,8 @@ public class UserController {
     }
 
     // 회원가입
-    @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createUSer(
+    @PostMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createUser(
             @Validated(UserRequest.addGroup.class) @RequestBody UserRequest userRequest) {
         return ResponseEntity.ok(
                 CommonResponse.<Long>builder()

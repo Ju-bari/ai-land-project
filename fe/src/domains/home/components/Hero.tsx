@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 
 export function Hero() {
+    const navigate = useNavigate()
+
     return (
         <section className="relative h-screen flex items-center justify-center overflow-hidden bg-slate-950 text-white">
             {/* Background effects */}
@@ -21,7 +24,7 @@ export function Hero() {
                     <Button
                         size="lg"
                         className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg rounded-full shadow-lg shadow-blue-900/20 transition-all hover:scale-105"
-                        onClick={() => window.location.href = '/lands'}
+                        onClick={() => navigate('/lands')}
                     >
                         랜드 찾아보기
                     </Button>

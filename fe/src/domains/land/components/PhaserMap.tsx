@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import Phaser from 'phaser'
 import { Player } from '../phaser/Player'
-import { useAuth } from '@/hooks/useAuth'
+import { useUserAuth } from '@/domains/user'
 
 interface PhaserMapProps {
   landImage?: string
@@ -18,7 +18,7 @@ export function PhaserMap({
   tilesetImagePath = '/maps/Serene_Village_32x32.png',
   tilesetName = 'first-tileset'
 }: PhaserMapProps) {
-  const { user } = useAuth()
+  const { user } = useUserAuth()
   const gameRef = useRef<HTMLDivElement>(null)
   const phaserGameRef = useRef<Phaser.Game | null>(null)
 
@@ -87,8 +87,8 @@ export function PhaserMap({
             this.player.create(playerX, playerY, this.mapWidth, this.mapHeight)
 
             // 사용자 이름 설정
-            if (user?.name) {
-              this.player.setProfile(user.name)
+            if (user?.nickname || user?.username) {
+              this.player.setProfile(user.nickname || user.username)
             }
 
             // 카메라가 플레이어를 따라가도록 설정
