@@ -4,20 +4,31 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, Thermometer, Mountain, Hammer, Mail, Calendar, Award, X, Users, ChevronLeft, ChevronRight, LogOut } from "lucide-react"
 import { dummyLands } from "@/domains/land/constants/dummyLands"
-import { dummyUsers, type User } from "@/domains/land/constants/dummyUsers"
 import { dummyMapInfo } from "@/domains/land/constants/dummyMapInfo"
 import { PhaserMap } from "./PhaserMap"
+import { useUserAuth } from "@/domains/user/hooks/useUserAuth"
+import { useMapWebSocket } from "@/domains/land/hooks/useMapWebSocket"
+import type { OnlinePlayer } from "@/domains/land/types/player.types"
 
 type RightPanelType = 'mapInfo' | 'userDetail'
 
 export function LandDetail() {
     const { id } = useParams()
     const navigate = useNavigate()
+    const { user } = useUserAuth()
     const land = dummyLands.find(l => l.id === Number(id))
     
     const [rightPanelType, setRightPanelType] = useState<RightPanelType>('mapInfo')
-    const [selectedUser, setSelectedUser] = useState<User | null>(null)
+    const [selectedUser, setSelectedUser] = useState<OnlinePlayer | null>(null)
     const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true)
+
+    // WebSocket 연결
+    const { isConnected, onlinePlayers, disconnect } = useMapWebSocket({
+        mapId: Number(id) || 1,
+        playerId: user?.id || 0,
+        playerName: user?.nickname || user?.username || 'Guest',
+        playerAvatar: '/players/player1.png',
+    })
 
     if (!land) {
         return (
@@ -32,11 +43,27 @@ export function LandDetail() {
         )
     }
 
-    const onlineUsers = dummyUsers.filter(user => user.isOnline)
-    const offlineUsers = dummyUsers.filter(user => !user.isOnline)
+    if (!user) {
+        return (
+            <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold mb-4">로그인이 필요합니다.</h1>
+                    <Button onClick={() => navigate('/login')} variant="outline">
+                        로그인하기
+                    </Button>
+                </div>
+            </div>
+        )
+    }
 
-    function handleUserClick(user: User) {
-        setSelectedUser(user)
+    // 나가기 핸들러
+    function handleLeave() {
+        disconnect() // WebSocket 연결 해제
+        navigate('/lands')
+    }
+
+    function handleUserClick(player: OnlinePlayer) {
+        setSelectedUser(player)
         setRightPanelType('userDetail')
     }
 
@@ -91,76 +118,57 @@ export function LandDetail() {
                                 <span className="text-slate-400 flex items-center gap-2">
                                     <Users className="w-4 h-4" />
                                     접속 유저
+                                    {isConnected && (
+                                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                    )}
                                 </span>
                                 <span className="text-slate-400">
-                                    {onlineUsers.length}/{dummyUsers.length}
+                                    {onlinePlayers.length}명 온라인
                                 </span>
                             </div>
                         </CardHeader>
                         <CardContent className="flex-1 space-y-4 overflow-y-auto">
-                                {/* 온라인 유저 */}
+                                {/* 온라인 유저만 표시 */}
                                 <div>
                                     <h4 className="text-xs font-semibold text-green-400 mb-2 uppercase">
-                                        온라인 ({onlineUsers.length})
+                                        온라인 ({onlinePlayers.length})
                                     </h4>
-                                    <div className="space-y-2">
-                                        {onlineUsers.map((user) => (
-                                            <div 
-                                                key={user.id} 
-                                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 transition-colors cursor-pointer"
-                                                onClick={() => handleUserClick(user)}
-                                            >
-                                                <div className="relative">
-                                                    <img 
-                                                        src={user.avatar} 
-                                                        alt={user.name}
-                                                        className="w-10 h-10 rounded-full"
-                                                    />
-                                                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></span>
+                                    {onlinePlayers.length === 0 ? (
+                                        <div className="text-center py-8 text-slate-500">
+                                            <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                                            <p className="text-sm">접속 중인 유저가 없습니다</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {onlinePlayers.map((player) => (
+                                                <div 
+                                                    key={player.id} 
+                                                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 transition-colors cursor-pointer"
+                                                    onClick={() => handleUserClick(player)}
+                                                >
+                                                    <div className="relative">
+                                                        <img 
+                                                            src={player.avatar} 
+                                                            alt={player.name}
+                                                            className="w-10 h-10 rounded-full"
+                                                        />
+                                                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></span>
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-medium text-white truncate">{player.name}</p>
+                                                        <p className="text-xs text-green-400">온라인</p>
+                                                    </div>
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                                                    <p className="text-xs text-green-400">온라인</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* 오프라인 유저 */}
-                                <div>
-                                    <h4 className="text-xs font-semibold text-slate-500 mb-2 uppercase">
-                                        오프라인 ({offlineUsers.length})
-                                    </h4>
-                                    <div className="space-y-2">
-                                        {offlineUsers.map((user) => (
-                                            <div 
-                                                key={user.id} 
-                                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 transition-colors opacity-60 cursor-pointer"
-                                                onClick={() => handleUserClick(user)}
-                                            >
-                                                <div className="relative">
-                                                    <img 
-                                                        src={user.avatar} 
-                                                        alt={user.name}
-                                                        className="w-10 h-10 rounded-full grayscale"
-                                                    />
-                                                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-slate-600 border-2 border-slate-900 rounded-full"></span>
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium text-slate-300 truncate">{user.name}</p>
-                                                    <p className="text-xs text-slate-500">{user.lastSeen}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                         </CardContent>
                         <div className="flex-shrink-0 p-4 border-t border-slate-700">
                             <Button 
                                 variant="outline"
                                 className="w-full bg-slate-800 text-white border-slate-700 hover:bg-red-600 hover:border-red-600 hover:text-white transition-all"
-                                onClick={() => navigate('/lands')}
+                                onClick={handleLeave}
                             >
                                 <LogOut className="w-4 h-4 mr-2" />
                                 나가기

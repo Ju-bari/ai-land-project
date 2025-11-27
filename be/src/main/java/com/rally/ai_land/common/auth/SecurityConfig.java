@@ -124,19 +124,14 @@ public class SecurityConfig {
                 // 인가 -> 처음에는 permitAll()
                 httpSecurity
                         .authorizeHttpRequests(auth -> auth
-                                        .requestMatchers("/api/v1/jwt/exchange", "/api/v1/jwt/refresh")
-                                        .permitAll()
-                                        .requestMatchers(HttpMethod.POST, "/api/v1/users/exist",
-                                                        "/api/v1/users")
-                                        .permitAll()
-                                        .requestMatchers("/api/v1/users/login", "/api/v1/users/logout")
-                                        .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/v1/users")
-                                        .hasRole(UserRoleType.USER.name())
-                                        .requestMatchers(HttpMethod.PUT, "/api/v1/users")
-                                        .hasRole(UserRoleType.USER.name())
-                                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users")
-                                        .hasRole(UserRoleType.USER.name())
+                                        .requestMatchers("/api/v1/jwt/exchange", "/api/v1/jwt/refresh").permitAll()
+                                        .requestMatchers(HttpMethod.POST, "/api/v1/users/exist", "/api/v1/users").permitAll()
+                                        .requestMatchers("/api/v1/users/login", "/api/v1/users/logout").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(UserRoleType.USER.name())
+                                        .requestMatchers(HttpMethod.PUT, "/api/v1/users").hasRole(UserRoleType.USER.name())
+                                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users").hasRole(UserRoleType.USER.name())
+                                        .requestMatchers("/ws/**").permitAll()
+                                        .requestMatchers("/ws").permitAll()
                                         .anyRequest().authenticated());
 
                 // 예외 처리
