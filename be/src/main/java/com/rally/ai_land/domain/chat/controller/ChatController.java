@@ -3,8 +3,6 @@ package com.rally.ai_land.domain.chat.controller;
 import com.rally.ai_land.common.constant.CommonConstant;
 import com.rally.ai_land.common.constant.CommonStatus;
 import com.rally.ai_land.common.dto.CommonResponse;
-import com.rally.ai_land.domain.agent.dto.AgentCreateRequest;
-import com.rally.ai_land.domain.auth.service.AuthService;
 import com.rally.ai_land.domain.chat.dto.ChatRoomCreateRequest;
 import com.rally.ai_land.domain.chat.dto.ChatRoomInfoResponse;
 import com.rally.ai_land.domain.chat.service.ChatService;
@@ -13,9 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +22,8 @@ import java.util.List;
 public class ChatController {
 
     private final ChatService chatService;
-    private final AuthService authService;
 
+    // TODO: 유저 ID
     @PostMapping(value = "/chats/rooms",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -37,7 +32,7 @@ public class ChatController {
                 CommonResponse.<Long>builder()
                         .successOrNot(CommonConstant.YES_FLAG)
                         .statusCode(CommonStatus.SUCCESS)
-                        .data(chatService.createChatRoom(authService.getCurrentUserId(), chatRoomCreateRequest))
+                        .data(chatService.createChatRoom(1L, chatRoomCreateRequest))
                         .build());
     }
 
