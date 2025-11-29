@@ -3,11 +3,9 @@ package com.rally.ai_land.domain.player.dto;
 import lombok.Data;
 
 @Data
-public class PlayerPosition {
+public class PlayerInfo {
 
     private Long playerId;
 
-    private double x;
-
-    private double y;
+    private String name;
 }

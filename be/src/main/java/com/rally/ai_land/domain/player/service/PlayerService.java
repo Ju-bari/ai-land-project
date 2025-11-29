@@ -1,7 +1,6 @@
 package com.rally.ai_land.domain.player.service;
 
-import com.rally.ai_land.domain.player.dto.PlayerStateRequest;
-import com.rally.ai_land.domain.player.dto.PlayerStateResponse;
+import com.rally.ai_land.domain.player.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,55 +8,61 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PlayerService {
 
-    // TODO: 레디스로 변경
     // LEAVE 의 경우 추가적인 EventListener 필요
-    private final SessionManagerService sessionManagerService;
+    private final StateManagerService stateManagerService;
 
+    // TODO: 비동기 처리 고려 (stateManager)
     public PlayerStateResponse handlePlayerState(Long mapId,
-                                                 PlayerStateRequest playerStateRequest,
-                                                 String sessionId) {
+                                                 PlayerStateRequest playerStateRequest) {
         switch (playerStateRequest.getType()) {
-            case "PLAYER_JOIN":
-                sessionManagerService.addPlayer(sessionId, playerStateRequest.getPlayerId(), mapId);
-                return handlePlayerJoin(playerStateRequest);
+            case "P_JOIN":
+                return handlePlayerJoin(mapId, (PlayerJoinRequest) playerStateRequest);
 
-            case "PLAYER_LEAVE":
-                sessionManagerService.removeSession(sessionId);
-                return handlePlayerLeave(playerStateRequest);
+            case "P_LEAVE":
+                return handlePlayerLeave(mapId, (PlayerLeaveRequest) playerStateRequest);
 
-            case "POSITION_UPDATE":
-                return handlePositionUpdate(playerStateRequest);
+            case "P_POSITION_UPDATE":
+                return handlePositionUpdate((PlayerPositionUpdateRequest) playerStateRequest);
 
             default:
-                throw new IllegalArgumentException("Unknown message type: " + playerStateRequest.getType());
+                throw new IllegalArgumentException("알 수 없는 message type: " + playerStateRequest.getType());
         }
     }
 
-    private PlayerStateResponse handlePlayerJoin(PlayerStateRequest playerStateRequest) {
-        return PlayerStateResponse.builder()
-                .type(playerStateRequest.getType())
-                .playerId(playerStateRequest.getPlayerId())
-                .playerName(playerStateRequest.getPlayerName())
-                .timestamp(System.currentTimeMillis()) // TODO: 확인 필요
+    private PlayerStateResponse handlePlayerJoin(Long mapId, PlayerJoinRequest request) {
+        // 업데이트
+        stateManagerService.registerPlayerMapOnline(mapId, request.getPlayerId());
+        stateManagerService.addPlayerInfo(request.getPlayerId());
+        stateManagerService.addOrInitializePlayerPosition(request.getPlayerId(), 0, 0); // 우선 초기값 0
+
+        return PlayerJoinResponse.builder()
+                .type(request.getType())
+                .playerId(request.getPlayerId())
+                .playerInfoList(stateManagerService.getPlayerMapOnline(mapId))
+                .playerPositionList(stateManagerService.getAllPlayerPositions(mapId))
                 .build();
     }
 
-    private PlayerStateResponse handlePlayerLeave(PlayerStateRequest playerStateRequest) {
-        return PlayerStateResponse.builder()
-                .type(playerStateRequest.getType())
-                .playerId(playerStateRequest.getPlayerId())
-                .playerName(playerStateRequest.getPlayerName())
-                .timestamp(System.currentTimeMillis()) // TODO: 확인 필요
+    private PlayerStateResponse handlePlayerLeave(Long mapId, PlayerLeaveRequest request) {
+        // 업데이트
+        stateManagerService.removePlayerMapOnline(request.getPlayerId());
+
+        return PlayerLeaveResponse.builder()
+                .type(request.getType())
+                .playerId(request.getPlayerId())
                 .build();
     }
 
-    private PlayerStateResponse handlePositionUpdate(PlayerStateRequest playerStateRequest) {
-        return PlayerStateResponse.builder()
-                .type(playerStateRequest.getType())
-                .playerId(playerStateRequest.getPlayerId())
-                .playerName(playerStateRequest.getPlayerName())
-                .playerPosition(playerStateRequest.getPlayerPosition())
-                .timestamp(System.currentTimeMillis()) // TODO: 확인 필요
+    private PlayerStateResponse handlePositionUpdate(PlayerPositionUpdateRequest request) {
+        // 업데이트
+        stateManagerService.updatePlayerPosition(request.getPlayerId(), request.getX(), request.getY(), request.getDir());
+
+        return PlayerPositionUpdateResponse.builder()
+                .type(request.getType())
+                .playerId(request.getPlayerId())
+                .x(request.getX())
+                .y(request.getY())
+                .dir(request.getDir())
                 .build();
     }
 }

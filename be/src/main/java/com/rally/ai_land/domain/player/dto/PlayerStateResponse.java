@@ -1,21 +1,32 @@
 package com.rally.ai_land.domain.player.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
-public class PlayerStateResponse {
+@SuperBuilder
+@NoArgsConstructor
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "t",
+        visible = true
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = PlayerJoinResponse.class, name = "P_JOIN"),
+        @JsonSubTypes.Type(value = PlayerLeaveResponse.class, name = "P_LEAVE"),
+        @JsonSubTypes.Type(value = PlayerPositionUpdateResponse.class, name = "P_POSITION_UPDATE")
+})
+public abstract class PlayerStateResponse {
 
-    private final String type;
+    @JsonProperty("t")
+    private String type;
 
-    private final Long playerId;
-
-    private String playerName;
-
-    private final PlayerPosition playerPosition;
-
-    private final Object data;
-
-    private final Long timestamp;
+    @JsonProperty("p")
+    private Long playerId;
 }

@@ -12,6 +12,7 @@ import lombok.Data;
 public class CommonResponse<T> {
 
     private String successOrNot;
+
     private Status statusCode;
 
     private T data;

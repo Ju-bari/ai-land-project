@@ -1,20 +1,30 @@
 package com.rally.ai_land.domain.player.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
-import java.util.Map;
-
 @Data
-// TODO: 웹소켓용 DTO 라 최적화 부분 찾아야 하는지 조사 필요
-public class PlayerStateRequest {
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "t",
+        visible = true
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = PlayerJoinRequest.class, name = "P_JOIN"),
+        @JsonSubTypes.Type(value = PlayerLeaveRequest.class, name = "P_LEAVE"),
+        @JsonSubTypes.Type(value = PlayerPositionUpdateRequest.class, name = "P_POSITION_UPDATE")
+})
+public abstract class PlayerStateRequest {
 
-    private String type; // "PLAYER_JOIN", "PLAYER_LEAVE", "POSITION_UPDATE"
+    // TODO: String type 최적화
+    // 플레이어 입장 및 퇴장: "P_JOIN", "P_LEAVE"
+    // 플레이어 포지션 업데이트: "P_POSITION_UPDATE"
+    @JsonProperty("t")
+    private String type;
 
-    private Long playerId; // userId
-
-    private String playerName; // userName
-
-    private PlayerPosition playerPosition;
-
-    private Map<String, Object> data;
+    @JsonProperty("p")
+    private Long playerId;
 }
