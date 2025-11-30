@@ -2,6 +2,7 @@ package com.rally.ai_land.domain.player.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -9,7 +10,4 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class PlayerJoinRequest extends PlayerStateRequest {
 
-//    public PlayerJoinRequest() {
-//        setType("P_JOIN");
-//    }
 }

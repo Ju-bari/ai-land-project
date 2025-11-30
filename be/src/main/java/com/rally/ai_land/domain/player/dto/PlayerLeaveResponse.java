@@ -9,7 +9,4 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class PlayerLeaveResponse extends PlayerStateResponse {
 
-//    public PlayerLeaveResponse() {
-//        setType("P_LEAVE");
-//    }
 }

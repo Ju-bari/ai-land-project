@@ -9,15 +9,11 @@ import lombok.EqualsAndHashCode;
 public class PlayerPositionUpdateRequest extends PlayerStateRequest {
 
     @JsonProperty("x")
-    private double x; // 자료구조 고민
+    private double x; // TODO: 자료구조 고민
 
     @JsonProperty("y")
     private double y;
 
     @JsonProperty("d")
     private short dir; // 1234: 상하좌우
-
-//    public PlayerPositionUpdateRequest() {
-//        setType("P_POSITION_UPDATE");
-//    }
 }

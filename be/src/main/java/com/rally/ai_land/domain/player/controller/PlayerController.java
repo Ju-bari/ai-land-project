@@ -21,14 +21,17 @@ public class PlayerController {
 
     private final PlayerService playerService;
 
-    // SimpMessageHeaderAccessor simpMessageHeaderAccessor
     // @Valid 고려
     @MessageMapping("/map/{mapId}") // /app/map/{mapId}
     @SendTo("/topic/map/{mapId}") // /topic/map/{mapId}
-    public PlayerStateResponse updatePlayerState(@DestinationVariable("mapId") Long mapId, @Payload PlayerStateRequest playerStateRequest) {
+    public PlayerStateResponse updatePlayerState(@DestinationVariable("mapId") Long mapId,
+                                                 @Payload PlayerStateRequest playerStateRequest,
+                                                 SimpMessageHeaderAccessor simpMessageHeaderAccessor) {
         log.info("보내는 메시지 목적지 맵 아이디  : {}", mapId);
         log.info("보내는 메시지 타입           : {}", playerStateRequest.getType());
 
-        return playerService.handlePlayerState(mapId, playerStateRequest);
+        return playerService.handlePlayerState(simpMessageHeaderAccessor.getSessionId(),
+                mapId,
+                playerStateRequest);
     }
 }

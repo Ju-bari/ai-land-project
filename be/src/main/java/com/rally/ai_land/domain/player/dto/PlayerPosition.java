@@ -1,8 +1,10 @@
 package com.rally.ai_land.domain.player.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class PlayerPosition {
 
     private Long playerId;
@@ -10,4 +12,6 @@ public class PlayerPosition {
     private double x;
 
     private double y;
+
+    private short d;
 }

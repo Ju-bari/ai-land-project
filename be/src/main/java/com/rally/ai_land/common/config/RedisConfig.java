@@ -31,12 +31,13 @@ public class RedisConfig {
         // Redis 를 연결
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
-        // Key-Value 형태로 직렬화를 수행
+        // Key: String 으로 직렬화 (읽기 편하게)
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-
-        // Hash Key-Value 형태로 직렬화를 수행
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+
+        // Value: String 으로 직렬화
+        // TODO: Value: JSON 으로 직렬화 (객체 구조 유지)
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(new StringRedisSerializer());
 
         // 기본적으로 직렬화를 수행

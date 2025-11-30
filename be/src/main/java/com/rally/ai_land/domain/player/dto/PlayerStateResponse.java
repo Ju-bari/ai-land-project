@@ -20,7 +20,7 @@ import lombok.experimental.SuperBuilder;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = PlayerJoinResponse.class, name = "P_JOIN"),
         @JsonSubTypes.Type(value = PlayerLeaveResponse.class, name = "P_LEAVE"),
-        @JsonSubTypes.Type(value = PlayerPositionUpdateResponse.class, name = "P_POSITION_UPDATE")
+        @JsonSubTypes.Type(value = PlayerPositionUpdateResponse.class, name = "P_MOVE")
 })
 public abstract class PlayerStateResponse {
 

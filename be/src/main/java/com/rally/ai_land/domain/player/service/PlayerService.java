@@ -12,16 +12,17 @@ public class PlayerService {
     private final StateManagerService stateManagerService;
 
     // TODO: 비동기 처리 고려 (stateManager)
-    public PlayerStateResponse handlePlayerState(Long mapId,
+    public PlayerStateResponse handlePlayerState(String sessionId,
+                                                 Long mapId,
                                                  PlayerStateRequest playerStateRequest) {
         switch (playerStateRequest.getType()) {
             case "P_JOIN":
-                return handlePlayerJoin(mapId, (PlayerJoinRequest) playerStateRequest);
+                return handlePlayerJoin(sessionId, mapId, (PlayerJoinRequest) playerStateRequest);
 
             case "P_LEAVE":
-                return handlePlayerLeave(mapId, (PlayerLeaveRequest) playerStateRequest);
+                return handlePlayerLeave(sessionId, mapId, (PlayerLeaveRequest) playerStateRequest);
 
-            case "P_POSITION_UPDATE":
+            case "P_MOVE":
                 return handlePositionUpdate((PlayerPositionUpdateRequest) playerStateRequest);
 
             default:
@@ -29,11 +30,11 @@ public class PlayerService {
         }
     }
 
-    private PlayerStateResponse handlePlayerJoin(Long mapId, PlayerJoinRequest request) {
-        // 업데이트
+    private PlayerStateResponse handlePlayerJoin(String sessionId, Long mapId, PlayerJoinRequest request) {
+        stateManagerService.setSession(sessionId, request.getPlayerId(), mapId);
         stateManagerService.registerPlayerMapOnline(mapId, request.getPlayerId());
-        stateManagerService.addPlayerInfo(request.getPlayerId());
-        stateManagerService.addOrInitializePlayerPosition(request.getPlayerId(), 0, 0); // 우선 초기값 0
+        stateManagerService.addPlayerInfo(mapId, request.getPlayerId());
+        stateManagerService.addOrInitializePlayerPosition(request.getPlayerId());
 
         return PlayerJoinResponse.builder()
                 .type(request.getType())
@@ -43,9 +44,10 @@ public class PlayerService {
                 .build();
     }
 
-    private PlayerStateResponse handlePlayerLeave(Long mapId, PlayerLeaveRequest request) {
-        // 업데이트
-        stateManagerService.removePlayerMapOnline(request.getPlayerId());
+    // WebSocketEventListener 로 인해 public 접근
+    public PlayerStateResponse handlePlayerLeave(String sessionId, Long mapId, PlayerLeaveRequest request) {
+        stateManagerService.removeSession(sessionId);
+        stateManagerService.removePlayerMapOnline(mapId, request.getPlayerId());
 
         return PlayerLeaveResponse.builder()
                 .type(request.getType())
@@ -54,7 +56,6 @@ public class PlayerService {
     }
 
     private PlayerStateResponse handlePositionUpdate(PlayerPositionUpdateRequest request) {
-        // 업데이트
         stateManagerService.updatePlayerPosition(request.getPlayerId(), request.getX(), request.getY(), request.getDir());
 
         return PlayerPositionUpdateResponse.builder()

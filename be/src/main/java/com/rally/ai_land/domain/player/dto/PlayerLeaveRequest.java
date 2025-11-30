@@ -2,12 +2,11 @@ package com.rally.ai_land.domain.player.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 @Data
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 public class PlayerLeaveRequest extends PlayerStateRequest {
 
-//    public PlayerLeaveRequest() {
-//        setType("P_LEAVE");
-//    }
 }
