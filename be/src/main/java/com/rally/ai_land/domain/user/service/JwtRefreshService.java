@@ -4,7 +4,7 @@ import com.rally.ai_land.common.auth.JwtUtil;
 import com.rally.ai_land.domain.user.dto.JwtResponse;
 import com.rally.ai_land.domain.user.dto.RefreshRequest;
 import com.rally.ai_land.domain.user.entity.JwtRefresh;
-import com.rally.ai_land.domain.user.repository.JwtRefreshRepository;
+import com.rally.ai_land.domain.user.repository.refreshRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class JwtRefreshService {
 
-    private final JwtRefreshRepository jwtRefreshRepository;
+    private final refreshRepository refreshRepository;
 
 
     // 소셜 로그인 성공 후 쿠키(Refresh) -> 헤더 방식으로 응답
@@ -65,8 +65,8 @@ public class JwtRefreshService {
                 .build();
 
         removeRefresh(refreshToken);
-        jwtRefreshRepository.flush(); // 같은 트랜잭션 내부라 : 삭제 -> 생성 문제 해결
-        jwtRefreshRepository.save(newJwtRefresh);
+        refreshRepository.flush(); // 같은 트랜잭션 내부라 : 삭제 -> 생성 문제 해결
+        refreshRepository.save(newJwtRefresh);
 
         // 기존 쿠키 제거
         Cookie refreshCookie = new Cookie("refreshToken", null);
@@ -111,7 +111,7 @@ public class JwtRefreshService {
                 .build();
 
         removeRefresh(refreshToken);
-        jwtRefreshRepository.save(newRefreshEntity);
+        refreshRepository.save(newRefreshEntity);
 
         return new JwtResponse(newAccessToken, newRefreshToken);
     }
@@ -124,22 +124,22 @@ public class JwtRefreshService {
                 .refresh(refreshToken)
                 .build();
 
-        jwtRefreshRepository.save(jwtRefresh);
+        refreshRepository.save(jwtRefresh);
     }
 
     // JWT Refresh 존재 확인 메소드
     @Transactional(readOnly = true)
     public Boolean existsJwtRefresh(String jwtRefresh) {
-        return jwtRefreshRepository.existsByRefresh(jwtRefresh);
+        return refreshRepository.existsByRefresh(jwtRefresh);
     }
 
     // JWT Refresh 토큰 삭제 메소드
     public void removeRefresh(String refreshToken) {
-        jwtRefreshRepository.deleteByRefresh(refreshToken);
+        refreshRepository.deleteByRefresh(refreshToken);
     }
 
     // 특정 유저 Refresh 토큰 모두 삭제 (탈퇴)
     public void removeRefreshUser(String username) {
-        jwtRefreshRepository.deleteByUsername(username);
+        refreshRepository.deleteByUsername(username);
     }
 }

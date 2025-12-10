@@ -20,7 +20,7 @@ public class PlayerService {
     public static short MAP_INIT_D = 2;
 
     // TODO: 비동기 처리 고려 (stateManager)
-    public PlayerStateResponse handlePlayerState(String sessionId,
+    public void handlePlayerState(String sessionId,
                                                  String username,
                                                  Long mapId,
                                                  PlayerStateRequest playerStateRequest) {
@@ -28,14 +28,16 @@ public class PlayerService {
             case "P_JOIN":
                 assert playerStateRequest instanceof PlayerJoinRequest;
                 handlePlayerJoin(sessionId, username, mapId, (PlayerJoinRequest) playerStateRequest);
-
+                return;
             case "P_LEAVE":
                 assert playerStateRequest instanceof PlayerLeaveRequest;
                 handlePlayerLeave(sessionId, mapId, (PlayerLeaveRequest) playerStateRequest);
+                return;
 
             case "P_MOVE":
                 assert playerStateRequest instanceof PlayerPositionUpdateRequest;
                 handlePositionUpdate(mapId, (PlayerPositionUpdateRequest) playerStateRequest);
+                return;
 
             default:
                 throw new IllegalArgumentException("알 수 없는 message type: " + playerStateRequest.getType());
@@ -44,7 +46,7 @@ public class PlayerService {
 
     private void handlePlayerJoin(String sessionId, String username, Long mapId, PlayerJoinRequest request) {
         // [상태 업데이트]
-        stateManagerService.setSession(sessionId, request.getPlayerId(), mapId);
+        stateManagerService.setSession(sessionId, mapId, request.getPlayerId());
         stateManagerService.registerPlayerMapOnline(mapId, request.getPlayerId());
         stateManagerService.addPlayerInfo(mapId, request.getPlayerId());
         stateManagerService.addOrInitializePlayerPosition(request.getPlayerId());

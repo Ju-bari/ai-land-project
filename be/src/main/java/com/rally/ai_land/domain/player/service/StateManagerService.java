@@ -7,6 +7,7 @@ import com.rally.ai_land.domain.user.entity.User;
 import com.rally.ai_land.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
@@ -21,13 +22,14 @@ import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class StateManagerService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final UserRepository userRepository;
 
-//    RedisSerializer keySerializer = redisTemplate.getStringSerializer();
-//    RedisSerializer valueSerializer = redisTemplate.getValueSerializer();
+    // RedisSerializer keySerializer = redisTemplate.getStringSerializer();
+    // RedisSerializer valueSerializer = redisTemplate.getValueSerializer();
 
     // TODO: TTL 고려
     // TODO: 유저, 맵 등 ID 타입 고려: Long or String -> Redis Config 에서 헬퍼 메서드 만들지 함께 고민
@@ -49,7 +51,8 @@ public class StateManagerService {
     public List<PlayerInfo> getPlayerMapOnline(Long mapId) {
         // 요청 1: 온라인 플레이어 ID 목록 조회 (Set)
         List<String> onlinePlayerIdList = getOnlinePlayerIdList(mapId);
-        if(onlinePlayerIdList == null || onlinePlayerIdList.isEmpty()) return new ArrayList<>();
+        if (onlinePlayerIdList == null || onlinePlayerIdList.isEmpty())
+            return new ArrayList<>();
 
         // 요청 2: player:{playerId} 키로 플레이어 정보 조회
         List<PlayerInfo> playerInfoList = new ArrayList<>();
@@ -73,7 +76,8 @@ public class StateManagerService {
     public List<PlayerInfo> getPlayerMapOnlineByPipelining(Long mapId) {
         // 요청 1: 온라인 플레이어 ID 목록 조회 (Set)
         List<String> onlinePlayerIdList = getOnlinePlayerIdList(mapId);
-        if(onlinePlayerIdList == null || onlinePlayerIdList.isEmpty()) return new ArrayList<>();
+        if (onlinePlayerIdList == null || onlinePlayerIdList.isEmpty())
+            return new ArrayList<>();
 
         // 요청 2: 온라인 플레이어 Info 조회 (Hash) -> pipeline 적용
         List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
@@ -134,7 +138,7 @@ public class StateManagerService {
 
         // 데이터 있는 경우: TTL 만 증가
         if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
-//            redisTemplate.expire(key, 30, TimeUnit.MINUTES);
+            // redisTemplate.expire(key, 30, TimeUnit.MINUTES);
             return;
         }
 
@@ -150,9 +154,9 @@ public class StateManagerService {
     }
 
     // [플레이어 정보] 플레이어 정보 제거: TTL 관리
-//    public void removePlayerInfo(Long playerId) {
-//
-//    }
+    // public void removePlayerInfo(Long playerId) {
+    //
+    // }
 
     // [플레이어 포지션] 플레이어 포지션 추가 및 초기화: Hash 자료구조는 덮어써짐 -> putIfAbsent(): Insert Only
     // TODO: 좌표 숫자 형식 최적화: 다른 자료구조 or 소수점 줄이기(ex. 2자리)
@@ -183,49 +187,53 @@ public class StateManagerService {
     }
 
     // [플레이어 포지션] 플레이어 포지션 제거: TTL 관리
-//    public void removePlayerPosition(Long playerId) {
-//
-//    }
+    // public void removePlayerPosition(Long playerId) {
+    //
+    // }
 
     // [플레이어 포지션] 플레이어 포지션 전체 조회
-//    public List<PlayerPosition> getAllPlayerPositions(Long mapId) {
-//        // 요청 1: 맵에 있는 온라인 유저들
-//        // TODO: <맵 온라인 플레이어 정보 제공> 단계에서 한 번 진행 -> 정합성 문제 발생할 수도
-//        List<String> onlinePlayerIdList = getOnlinePlayerIdList(mapId);
-//        if(onlinePlayerIdList == null || onlinePlayerIdList.isEmpty()) return new ArrayList<>();
-//
-//        // 요청 2: 온라인 유저들 포지션
-//        List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-//            for (String playerId : onlinePlayerIdList) {
-//                String playerKey = "player:" + playerId + ":position";
-//                connection.hashCommands().hGetAll(playerKey.getBytes(StandardCharsets.UTF_8));
-//            }
-//            return null;
-//        });
-//
-//        // 결과 처리
-//        List<PlayerPosition> playerPositionList = new ArrayList<>();
-//        for (int i = 0; i < results.size(); i++) {
-//            // 변환 필요
-//            Map<byte[], byte[]> playerPositionBytes = (Map<byte[], byte[]>) results.get(i);
-//
-//            // 리스트 담기
-//            if (playerPositionBytes != null && !playerPositionBytes.isEmpty()) {
-//                Map<String, String> playerPositionData = convertBytesToStringMap(playerPositionBytes);
-//
-//                playerPositionList.add(PlayerPosition.builder()
-//                                .playerId(Long.valueOf(onlinePlayerIdList.get(i)))
-//                                .x(Double.parseDouble(playerPositionData.get("x")))
-//                                .y(Double.parseDouble(playerPositionData.get("y")))
-//                                .d(Short.parseShort(playerPositionData.get("d")))
-//                                .build());
-//            }
-//        }
-//        return playerPositionList;
-//    }
+    // public List<PlayerPosition> getAllPlayerPositions(Long mapId) {
+    // // 요청 1: 맵에 있는 온라인 유저들
+    // // TODO: <맵 온라인 플레이어 정보 제공> 단계에서 한 번 진행 -> 정합성 문제 발생할 수도
+    // List<String> onlinePlayerIdList = getOnlinePlayerIdList(mapId);
+    // if(onlinePlayerIdList == null || onlinePlayerIdList.isEmpty()) return new
+    // ArrayList<>();
+    //
+    // // 요청 2: 온라인 유저들 포지션
+    // List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>)
+    // connection -> {
+    // for (String playerId : onlinePlayerIdList) {
+    // String playerKey = "player:" + playerId + ":position";
+    // connection.hashCommands().hGetAll(playerKey.getBytes(StandardCharsets.UTF_8));
+    // }
+    // return null;
+    // });
+    //
+    // // 결과 처리
+    // List<PlayerPosition> playerPositionList = new ArrayList<>();
+    // for (int i = 0; i < results.size(); i++) {
+    // // 변환 필요
+    // Map<byte[], byte[]> playerPositionBytes = (Map<byte[], byte[]>)
+    // results.get(i);
+    //
+    // // 리스트 담기
+    // if (playerPositionBytes != null && !playerPositionBytes.isEmpty()) {
+    // Map<String, String> playerPositionData =
+    // convertBytesToStringMap(playerPositionBytes);
+    //
+    // playerPositionList.add(PlayerPosition.builder()
+    // .playerId(Long.valueOf(onlinePlayerIdList.get(i)))
+    // .x(Double.parseDouble(playerPositionData.get("x")))
+    // .y(Double.parseDouble(playerPositionData.get("y")))
+    // .d(Short.parseShort(playerPositionData.get("d")))
+    // .build());
+    // }
+    // }
+    // return playerPositionList;
+    // }
     public List<PlayerPosition> getAllPlayerPositions(Long mapId) {
         List<String> onlinePlayerIdList = getOnlinePlayerIdList(mapId);
-        if(onlinePlayerIdList == null || onlinePlayerIdList.isEmpty()) {
+        if (onlinePlayerIdList == null || onlinePlayerIdList.isEmpty()) {
             return new ArrayList<>();
         }
 
@@ -277,6 +285,7 @@ public class StateManagerService {
     public PlayerSession getSession(String sessionId) {
         String key = "session:" + sessionId;
         Map<Object, Object> playerSessionObject = redisTemplate.opsForHash().entries(key);
+        log.info("playerSessionObject: " + playerSessionObject.toString());
 
         return PlayerSession.builder()
                 .mapId(Long.parseLong(String.valueOf(playerSessionObject.get("mapId"))))

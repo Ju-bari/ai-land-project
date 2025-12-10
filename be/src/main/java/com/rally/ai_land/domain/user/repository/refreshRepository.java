@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-public interface JwtRefreshRepository extends JpaRepository<JwtRefresh, Long> {
+public interface refreshRepository extends JpaRepository<JwtRefresh, Long> {
 
     Boolean existsByRefresh(String jwtRefresh);
 

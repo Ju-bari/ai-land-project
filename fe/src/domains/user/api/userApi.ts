@@ -31,9 +31,9 @@ function onTokenRefreshed(newToken: string) {
 }
 
 // JWT Refresh API
-async function refreshAccessToken(): Promise<string> {
+export async function refreshAccessToken(): Promise<string> {
   const refreshToken = getRefreshToken();
-  
+
   if (!refreshToken) {
     throw new Error('No refresh token available');
   }
@@ -54,7 +54,7 @@ async function refreshAccessToken(): Promise<string> {
 
   const jwtResponse: JwtResponse = await response.json();
   saveTokens(jwtResponse.accessToken, jwtResponse.refreshToken);
-  
+
   return jwtResponse.accessToken;
 }
 
@@ -71,7 +71,7 @@ async function apiRequest<T>(
 ): Promise<CommonResponse<T>> {
   const { requireAuth = true, ...fetchOptions } = options;
   const token = getAccessToken();
-  
+
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
@@ -89,19 +89,19 @@ async function apiRequest<T>(
   if (response.status === 401 && retry && requireAuth) {
     if (!isRefreshing) {
       isRefreshing = true;
-      
+
       try {
         const newToken = await refreshAccessToken();
         isRefreshing = false;
         onTokenRefreshed(newToken);
-        
+
         // 새 토큰으로 재시도
         return apiRequest<T>(endpoint, options, false);
       } catch (error) {
         isRefreshing = false;
         refreshSubscribers = [];
         clearAllTokens();
-        
+
         // 로그인 페이지로 리다이렉트
         window.location.href = '/login';
         throw new Error('Session expired. Please login again.');
@@ -149,7 +149,7 @@ export async function exchangeJwtToken(): Promise<JwtResponse> {
 
   const jwtResponse: JwtResponse = await response.json();
   saveTokens(jwtResponse.accessToken, jwtResponse.refreshToken);
-  
+
   return jwtResponse;
 }
 
@@ -183,7 +183,7 @@ export async function loginUser(data: LoginRequest): Promise<JwtResponse> {
       } else if (response.status === 403) {
         throw new Error('계정이 잠겨있거나 접근이 거부되었습니다.');
       }
-      
+
       const errorData = await response.json().catch(() => ({
         message: '로그인에 실패했습니다.',
       }));
@@ -191,14 +191,14 @@ export async function loginUser(data: LoginRequest): Promise<JwtResponse> {
     }
 
     const jwtResponse: JwtResponse = await response.json();
-    
+
     // JWT 토큰 검증
     if (!jwtResponse.accessToken || !jwtResponse.refreshToken) {
       throw new Error('서버에서 유효한 토큰을 받지 못했습니다.');
     }
-    
+
     saveTokens(jwtResponse.accessToken, jwtResponse.refreshToken);
-    
+
     return jwtResponse;
   } catch (error) {
     // 네트워크 에러 등
@@ -256,18 +256,18 @@ export async function getUserInfo(): Promise<UserInfoResponse> {
   });
   console.log('📡 getUserInfo API 응답:', response);
   console.log('📡 response.data:', response.data);
-  
+
   // 데이터 검증
   if (!response.data) {
     console.error('❌ getUserInfo: response.data가 없습니다');
     throw new Error('Invalid user info response: no data');
   }
-  
+
   if (!response.data.userId) {
     console.error('❌ getUserInfo: user.userId가 없습니다:', response.data);
     throw new Error('Invalid user info response: missing userId');
   }
-  
+
   console.log('✅ getUserInfo 성공 - userId:', response.data.userId, 'username:', response.data.username);
   return response.data;
 }

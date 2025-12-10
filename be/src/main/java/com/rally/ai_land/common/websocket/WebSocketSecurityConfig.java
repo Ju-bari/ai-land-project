@@ -1,24 +1,34 @@
 package com.rally.ai_land.common.websocket;
 
-import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
-import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.socket.EnableWebSocketSecurity;
+import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
 
+@Configuration
 @EnableWebSocketSecurity
-public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+public class WebSocketSecurityConfig {
 
-    @Override
-    protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+    @Bean
+    public AuthorizationManager<Message<?>> messageAuthorizationManager(
+            MessageMatcherDelegatingAuthorizationManager.Builder messages) {
         messages
                 .nullDestMatcher().permitAll()
                 .simpDestMatchers("/app/**").authenticated()
                 .simpSubscribeDestMatchers("/topic/**").authenticated()
+                .simpSubscribeDestMatchers("/queue/**").authenticated()
+                .simpSubscribeDestMatchers("/user/queue/**").authenticated()
                 .anyMessage().denyAll();
+
+        return messages.build();
     }
 
-    @Override
-    protected boolean sameOriginDisabled() {
-        return true;
+    @Bean("csrfChannelInterceptor")
+    public ChannelInterceptor csrfChannelInterceptor() {
+        return new ChannelInterceptor() {
+        };
     }
-
 }

@@ -94,59 +94,62 @@ public class SecurityConfig {
 
                 // CSRF 보안 필터 disable
                 httpSecurity
-                        .csrf(AbstractHttpConfigurer::disable);
+                                .csrf(AbstractHttpConfigurer::disable);
 
                 // CORS 설정
                 httpSecurity
-                        .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
                 // 기본 로그아웃 필터 + 커스텀 Refresh 토큰 삭제 핸들러 추가
                 httpSecurity
-                        .logout(logout -> logout
-                                        .logoutUrl("/api/v1/users/logout") // 로그아웃 Endpoint
-                                        .addLogoutHandler(new RefreshTokenLogoutHandler(jwtRefreshService))
-                                        .logoutSuccessHandler(new CustomLogoutSuccessHandler())
-                                        .permitAll());
+                                .logout(logout -> logout
+                                                .logoutUrl("/api/v1/users/logout") // 로그아웃 Endpoint
+                                                .addLogoutHandler(new RefreshTokenLogoutHandler(jwtRefreshService))
+                                                .logoutSuccessHandler(new CustomLogoutSuccessHandler())
+                                                .permitAll());
 
                 // 기본 Form 기반 인증 필터들 disable -> 커스텀 사용
                 httpSecurity
-                        .formLogin(AbstractHttpConfigurer::disable);
+                                .formLogin(AbstractHttpConfigurer::disable);
 
                 // 기본 Basic 인증 필터 disable -> 커스텀 사용
                 httpSecurity
-                        .httpBasic(AbstractHttpConfigurer::disable);
+                                .httpBasic(AbstractHttpConfigurer::disable);
 
                 // OAuth2 인증용
                 httpSecurity
-                        .oauth2Login(oauth2 -> oauth2
-                                        .successHandler(socialSuccessHandler));
+                                .oauth2Login(oauth2 -> oauth2
+                                                .successHandler(socialSuccessHandler));
 
                 // 인가 -> 처음에는 permitAll()
                 httpSecurity
-                        .authorizeHttpRequests(auth -> auth
-                                        .requestMatchers("/api/v1/jwt/exchange", "/api/v1/jwt/refresh").permitAll()
-                                        .requestMatchers(HttpMethod.POST, "/api/v1/users/exist", "/api/v1/users").permitAll()
-                                        .requestMatchers("/api/v1/users/login", "/api/v1/users/logout").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(UserRoleType.USER.name())
-                                        .requestMatchers(HttpMethod.PUT, "/api/v1/users").hasRole(UserRoleType.USER.name())
-                                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users").hasRole(UserRoleType.USER.name())
-                                        .anyRequest().authenticated());
-
-                // WebSocket 해당 설정에서는 permit
-                httpSecurity
-                        .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/ws/**").permitAll()
-                                .anyRequest().authenticated());
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/api/v1/jwt/exchange", "/api/v1/jwt/refresh")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/users/exist",
+                                                                "/api/v1/users")
+                                                .permitAll()
+                                                .requestMatchers("/api/v1/users/login", "/api/v1/users/logout")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/users")
+                                                .hasRole(UserRoleType.USER.name())
+                                                .requestMatchers(HttpMethod.PUT, "/api/v1/users")
+                                                .hasRole(UserRoleType.USER.name())
+                                                .requestMatchers(HttpMethod.DELETE, "/api/v1/users")
+                                                .hasRole(UserRoleType.USER.name())
+                                                .requestMatchers("/ws/**").permitAll() // WebSocket 해당 설정에서는 permit
+                                                .anyRequest().authenticated());
 
                 // 예외 처리
                 httpSecurity
-                        .exceptionHandling(e -> e
-                                        .authenticationEntryPoint((request, response, authException) -> {
-                                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED); // 401 응답
-                                        })
-                                        .accessDeniedHandler((request, response, authException) -> {
-                                                response.sendError(HttpServletResponse.SC_FORBIDDEN); // 403 응답
-                                        }));
+                                .exceptionHandling(e -> e
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                                                                                                                 // 응답
+                                                })
+                                                .accessDeniedHandler((request, response, authException) -> {
+                                                        response.sendError(HttpServletResponse.SC_FORBIDDEN); // 403 응답
+                                                }));
 
                 // 커스텀 필터 추가
                 /**
@@ -157,15 +160,15 @@ public class SecurityConfig {
                  * - UsernamePasswordAuthenticationFilter (Spring Security 기본) -> 둘 순서 랜덤
                  */
                 httpSecurity
-                        .addFilterBefore(new JwtFilter(), LogoutFilter.class);
+                                .addFilterBefore(new JwtFilter(), LogoutFilter.class);
                 httpSecurity
-                        .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),
-                                        loginSuccessHandler), UsernamePasswordAuthenticationFilter.class);
+                                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),
+                                                loginSuccessHandler), UsernamePasswordAuthenticationFilter.class);
 
                 // 세션 필터 설정 (STATELESS)
                 httpSecurity
-                        .sessionManagement(session -> session
-                                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
                 return httpSecurity.build();
         }

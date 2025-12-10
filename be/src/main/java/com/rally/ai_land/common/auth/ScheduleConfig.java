@@ -1,6 +1,6 @@
 package com.rally.ai_land.common.auth;
 
-import com.rally.ai_land.domain.user.repository.JwtRefreshRepository;
+import com.rally.ai_land.domain.user.repository.refreshRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ScheduleConfig {
 
-    private final JwtRefreshRepository jwtRefreshRepository;
+    private final refreshRepository refreshRepository;
 
 
     // Refresh 토큰 저장소 8일 지난 토큰 삭제
@@ -19,6 +19,6 @@ public class ScheduleConfig {
     @Scheduled(cron = "0 0 3 * * *")
     public void refreshEntityTtlSchedule() {
         LocalDateTime cutoff = LocalDateTime.now().minusDays(8);
-        jwtRefreshRepository.deleteByCreatedAtBefore(cutoff);
+        refreshRepository.deleteByCreatedAtBefore(cutoff);
     }
 }
