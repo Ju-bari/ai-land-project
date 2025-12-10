@@ -14,6 +14,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -21,16 +23,22 @@ public class PlayerController {
 
     private final PlayerService playerService;
 
-    // @Valid 고려
-    @MessageMapping("/map/{mapId}") // /app/map/{mapId}
-    @SendTo("/topic/map/{mapId}") // /topic/map/{mapId}
-    public PlayerStateResponse updatePlayerState(@DestinationVariable("mapId") Long mapId,
-                                                 @Payload PlayerStateRequest playerStateRequest,
-                                                 SimpMessageHeaderAccessor simpMessageHeaderAccessor) {
-        log.info("보내는 메시지 목적지 맵 아이디  : {}", mapId);
-        log.info("보내는 메시지 타입           : {}", playerStateRequest.getType());
 
-        return playerService.handlePlayerState(simpMessageHeaderAccessor.getSessionId(),
+    // TODO: @Valid 고려
+    // TODO: 보안 고려
+    @MessageMapping("/map/{mapId}") // /app/map/{mapId}
+//    @SendTo("/topic/map/{mapId}") // /topic/map/{mapId}
+    public void updatePlayerState(@DestinationVariable("mapId") Long mapId,
+                                  @Payload PlayerStateRequest playerStateRequest,
+                                  SimpMessageHeaderAccessor simpMessageHeaderAccessor,
+                                  Principal principal) {
+        log.info("[받은 메시지] 목적지 맵 아이디  : {}", mapId);
+        log.info("[받은 메시지] 보낸 유저 아이디  : {}", playerStateRequest.getPlayerId());
+        log.info("[받은 메시지] 보낸 유저 이름   : {}", principal.getName());
+        log.info("[받은 메시지] 타입           : {}", playerStateRequest.getType());
+
+        playerService.handlePlayerState(simpMessageHeaderAccessor.getSessionId(),
+                principal.getName(), // Spring Security 의 UserDetails.getUsername() 값
                 mapId,
                 playerStateRequest);
     }

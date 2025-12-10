@@ -250,9 +250,25 @@ export async function signUpUser(data: UserSignUpRequest): Promise<number> {
 
 // 유저 정보 조회 API
 export async function getUserInfo(): Promise<UserInfoResponse> {
+  console.log('📡 getUserInfo API 호출 중...');
   const response = await apiRequest<UserInfoResponse>('/users', {
     method: 'GET',
   });
+  console.log('📡 getUserInfo API 응답:', response);
+  console.log('📡 response.data:', response.data);
+  
+  // 데이터 검증
+  if (!response.data) {
+    console.error('❌ getUserInfo: response.data가 없습니다');
+    throw new Error('Invalid user info response: no data');
+  }
+  
+  if (!response.data.userId) {
+    console.error('❌ getUserInfo: user.userId가 없습니다:', response.data);
+    throw new Error('Invalid user info response: missing userId');
+  }
+  
+  console.log('✅ getUserInfo 성공 - userId:', response.data.userId, 'username:', response.data.username);
   return response.data;
 }
 

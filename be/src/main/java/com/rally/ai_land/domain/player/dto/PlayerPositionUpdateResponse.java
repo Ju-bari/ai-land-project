@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 public class PlayerPositionUpdateResponse extends PlayerStateResponse {
 
     @JsonProperty("x")
-    private double x; // 자료구조 고민
+    private double x; // TODO: 자료구조 고민
 
     @JsonProperty("y")
     private double y;

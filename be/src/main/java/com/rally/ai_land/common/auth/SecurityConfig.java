@@ -130,9 +130,13 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(UserRoleType.USER.name())
                                         .requestMatchers(HttpMethod.PUT, "/api/v1/users").hasRole(UserRoleType.USER.name())
                                         .requestMatchers(HttpMethod.DELETE, "/api/v1/users").hasRole(UserRoleType.USER.name())
-                                        .requestMatchers("/ws/**").permitAll()
-                                        .requestMatchers("/ws").permitAll()
                                         .anyRequest().authenticated());
+
+                // WebSocket 해당 설정에서는 permit
+                httpSecurity
+                        .authorizeHttpRequests(auth -> auth
+                                .requestMatchers("/ws/**").permitAll()
+                                .anyRequest().authenticated());
 
                 // 예외 처리
                 httpSecurity

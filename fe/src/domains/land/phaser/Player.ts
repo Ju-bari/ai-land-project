@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { roundCoordinate } from '@/utils'
 
 export class Player {
   private scene: Phaser.Scene
@@ -18,8 +19,16 @@ export class Player {
   // UI
   private nameTag?: Phaser.GameObjects.Text
 
-  constructor(scene: Phaser.Scene) {
+  // 위치 업데이트 콜백
+  private onPositionUpdate?: (x: number, y: number, direction: 'U' | 'D' | 'L' | 'R') => void
+  private lastSentPosition: { x: number; y: number; direction: string } = { x: 0, y: 0, direction: 'down' }
+  private updateThreshold: number = 5  // 픽셀 단위로 이 거리 이상 움직였을 때만 업데이트 전송
+  private lastUpdateTime: number = 0
+  private updateInterval: number = 100  // 100ms마다 한 번만 전송 (초당 10회)
+
+  constructor(scene: Phaser.Scene, onPositionUpdate?: (x: number, y: number, direction: 'U' | 'D' | 'L' | 'R') => void) {
     this.scene = scene
+    this.onPositionUpdate = onPositionUpdate
   }
 
   /**
@@ -173,6 +182,54 @@ export class Player {
     // 이름표 위치 업데이트
     if (this.nameTag) {
       this.nameTag.setPosition(this.sprite.x, this.sprite.y - 40)
+    }
+
+    // 위치 업데이트 전송 (throttle 적용)
+    this.sendPositionUpdateIfNeeded()
+  }
+
+  /**
+   * 위치 업데이트 전송 (일정 거리 이상 움직이고, 일정 시간이 지났을 때만)
+   */
+  private sendPositionUpdateIfNeeded() {
+    if (!this.sprite || !this.onPositionUpdate) return
+
+    const currentTime = Date.now()
+    const currentX = this.sprite.x
+    const currentY = this.sprite.y
+    const currentDirection = this.lastDirection
+
+    // 시간 체크: 마지막 전송 이후 updateInterval(100ms) 이상 경과했는지
+    if (currentTime - this.lastUpdateTime < this.updateInterval) {
+      return
+    }
+
+    // 거리 체크: 이전 위치와 일정 거리 이상 차이나는지
+    const dx = currentX - this.lastSentPosition.x
+    const dy = currentY - this.lastSentPosition.y
+    const distance = Math.sqrt(dx * dx + dy * dy)
+
+    // 방향이 바뀌었거나, 일정 거리 이상 움직였을 때만 전송
+    if (distance >= this.updateThreshold || currentDirection !== this.lastSentPosition.direction) {
+      // 방향 변환: down -> D, up -> U, left -> L, right -> R
+      const directionMap: { [key: string]: 'U' | 'D' | 'L' | 'R' } = {
+        down: 'D',
+        up: 'U',
+        left: 'L',
+        right: 'R'
+      }
+      const direction = directionMap[currentDirection] || 'D'
+
+      // 좌표를 소수점 둘째자리로 반올림하여 전송
+      const roundedX = roundCoordinate(currentX, 2)
+      const roundedY = roundCoordinate(currentY, 2)
+
+      // 위치 업데이트 전송
+      this.onPositionUpdate(roundedX, roundedY, direction)
+
+      // 마지막 전송 정보 업데이트
+      this.lastSentPosition = { x: currentX, y: currentY, direction: currentDirection }
+      this.lastUpdateTime = currentTime
     }
   }
 

@@ -11,8 +11,9 @@ export interface UserSignUpRequest {
 }
 
 export interface UserInfoResponse {
-  id: number;
+  userId: number;  // 백엔드에서 userId로 변경됨
   username: string;
+  social: boolean;  // 소셜 로그인 여부
   nickname: string;
   email: string;
 }
@@ -42,10 +43,11 @@ export interface CommonResponse<T> {
 
 // 사용자 타입
 export interface User {
-  id: number;
+  id: number;  // 내부적으로는 id로 사용 (UserInfoResponse의 userId를 매핑)
   username: string;
   nickname: string;
   email: string;
+  social?: boolean;  // 소셜 로그인 여부 (선택적)
 }
 
 // 인증 컨텍스트 타입

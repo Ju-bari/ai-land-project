@@ -22,14 +22,27 @@ export function LandDetail() {
     const [selectedUser, setSelectedUser] = useState<OnlinePlayer | null>(null)
     const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true)
 
-    // WebSocket 연결
-    const { isConnected, onlinePlayers, disconnect } = useMapWebSocket({
-        mapId: Number(id) || 1,
-        playerId: user?.id || 0,
-        playerName: user?.nickname || user?.username || 'Guest',
-        playerAvatar: '/players/player1.png',
+    // 디버깅: user 정보 확인
+    console.log('🔍 LandDetail - user 정보:', user);
+    console.log('🔍 LandDetail - user?.id:', user?.id);
+    console.log('🔍 LandDetail - user?.username:', user?.username);
+    
+    // WebSocket 연결 - user?.id가 없으면 내부에서 연결하지 않음
+    const { isConnected, onlinePlayers, sendPositionUpdate, disconnect } = useMapWebSocket({
+        mapId: Number(id),
+        playerId: user?.id ?? null,  // null을 명시적으로 전달하여 내부에서 체크
     })
+    
+    console.log('🔍 WebSocket에 전달된 playerId:', user?.id ?? null);
+    console.log('🔍 현재 온라인 플레이어 수:', onlinePlayers.length);
+    console.log('🔍 온라인 플레이어 목록:', onlinePlayers);
+    console.log('🔍 PhaserMap에 전달할 onlinePlayers:', onlinePlayers.map(p => ({
+        id: p.id,
+        name: p.name,
+        position: p.position
+    })));
 
+    // land가 없으면 에러 표시
     if (!land) {
         return (
             <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
@@ -43,12 +56,13 @@ export function LandDetail() {
         )
     }
 
-    if (!user) {
+    // user가 없거나 user.id가 없으면 로그인 필요 표시
+    if (!user || !user.id) {
         return (
             <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-2xl font-bold mb-4">로그인이 필요합니다.</h1>
-                    <Button onClick={() => navigate('/login')} variant="outline">
+                    <Button onClick={() => navigate('/login')} variant="outline" className="text-black hover:text-black">
                         로그인하기
                     </Button>
                 </div>
@@ -84,6 +98,8 @@ export function LandDetail() {
                         tilemapJsonPath="/maps/map1.tmj"
                         tilesetImagePath="/maps/Serene_Village_32x32.png"
                         tilesetName="first-tileset"
+                        onPositionUpdate={sendPositionUpdate}  // 위치 업데이트 콜백 전달
+                        onlinePlayers={onlinePlayers}  // 온라인 플레이어 목록 전달
                     />
                 </div>
 

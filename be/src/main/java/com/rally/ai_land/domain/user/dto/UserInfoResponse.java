@@ -1,4 +1,4 @@
 package com.rally.ai_land.domain.user.dto;
 
-public record UserInfoResponse(String username, Boolean social, String nickname, String email) {
+public record UserInfoResponse(Long userId, String username, Boolean social, String nickname, String email) {
 }
