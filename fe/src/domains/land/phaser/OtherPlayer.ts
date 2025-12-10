@@ -30,18 +30,10 @@ export class OtherPlayer {
    * 다른 플레이어 스프라이트 생성
    */
   create(x: number, y: number) {
-    console.log(`👤 OtherPlayer.create 호출:`, {
-      playerId: this.playerId,
-      playerName: this.playerName,
-      x,
-      y
-    })
-
     try {
       // Physics 활성화된 스프라이트 생성
       this.sprite = this.scene.physics.add.sprite(x, y, 'player')
       this.sprite.setScale(this.scale)
-      console.log(`✅ 스프라이트 생성 완료:`, this.playerId)
 
       // 목표 위치 초기화
       this.targetX = x
@@ -49,7 +41,6 @@ export class OtherPlayer {
 
       // 애니메이션이 없으면 생성
       this.ensureAnimations()
-      console.log(`✅ 애니메이션 설정 완료:`, this.playerId)
 
       // 이름표 생성
       this.nameTag = this.scene.add.text(x, y - 40, this.playerName, {
@@ -60,13 +51,11 @@ export class OtherPlayer {
         strokeThickness: 3,
         align: 'center'
       }).setOrigin(0.5)
-      console.log(`✅ 이름표 생성 완료:`, this.playerId, this.playerName)
 
       // 기본 애니메이션 재생
       this.sprite.play('idle-down')
-      console.log(`✅ 플레이어 ${this.playerId} (${this.playerName}) 생성 완료!`)
     } catch (error) {
-      console.error(`❌ OtherPlayer 생성 에러:`, this.playerId, error)
+      console.error('OtherPlayer 생성 에러:', this.playerId, error)
     }
   }
 

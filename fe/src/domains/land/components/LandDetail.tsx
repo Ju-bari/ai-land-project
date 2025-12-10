@@ -17,30 +17,16 @@ export function LandDetail() {
     const navigate = useNavigate()
     const { user } = useUserAuth()
     const land = dummyLands.find(l => l.id === Number(id))
-    
+
     const [rightPanelType, setRightPanelType] = useState<RightPanelType>('mapInfo')
     const [selectedUser, setSelectedUser] = useState<OnlinePlayer | null>(null)
     const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true)
 
-    // 디버깅: user 정보 확인
-    console.log('🔍 LandDetail - user 정보:', user);
-    console.log('🔍 LandDetail - user?.id:', user?.id);
-    console.log('🔍 LandDetail - user?.username:', user?.username);
-    
     // WebSocket 연결 - user?.id가 없으면 내부에서 연결하지 않음
     const { isConnected, onlinePlayers, sendPositionUpdate, disconnect } = useMapWebSocket({
         mapId: Number(id),
-        playerId: user?.id ?? null,  // null을 명시적으로 전달하여 내부에서 체크
+        playerId: user?.id ?? null,
     })
-    
-    console.log('🔍 WebSocket에 전달된 playerId:', user?.id ?? null);
-    console.log('🔍 현재 온라인 플레이어 수:', onlinePlayers.length);
-    console.log('🔍 온라인 플레이어 목록:', onlinePlayers);
-    console.log('🔍 PhaserMap에 전달할 onlinePlayers:', onlinePlayers.map(p => ({
-        id: p.id,
-        name: p.name,
-        position: p.position
-    })));
 
     // land가 없으면 에러 표시
     if (!land) {
@@ -90,10 +76,10 @@ export function LandDetail() {
         <div className="fixed inset-0 bg-slate-950 text-white overflow-hidden">
             {/* 전체 화면 레이아웃 */}
             <div className="relative h-full w-full">
-                
+
                 {/* 가운데: 전체 화면 Phaser 타일맵 배경 */}
                 <div className="absolute inset-0 z-0">
-                    <PhaserMap 
+                    <PhaserMap
                         useTilemap={true}
                         tilemapJsonPath="/maps/map1.tmj"
                         tilesetImagePath="/maps/Serene_Village_32x32.png"
@@ -125,7 +111,7 @@ export function LandDetail() {
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </Button>
-                        
+
                         <CardHeader className="flex-shrink-0">
                             <CardTitle className="text-white text-xl mb-2 pr-14">
                                 {land.name}
@@ -144,44 +130,44 @@ export function LandDetail() {
                             </div>
                         </CardHeader>
                         <CardContent className="flex-1 space-y-4 overflow-y-auto">
-                                {/* 온라인 유저만 표시 */}
-                                <div>
-                                    <h4 className="text-xs font-semibold text-green-400 mb-2 uppercase">
-                                        온라인 ({onlinePlayers.length})
-                                    </h4>
-                                    {onlinePlayers.length === 0 ? (
-                                        <div className="text-center py-8 text-slate-500">
-                                            <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                                            <p className="text-sm">접속 중인 유저가 없습니다</p>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2">
-                                            {onlinePlayers.map((player) => (
-                                                <div 
-                                                    key={player.id} 
-                                                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 transition-colors cursor-pointer"
-                                                    onClick={() => handleUserClick(player)}
-                                                >
-                                                    <div className="relative">
-                                                        <img 
-                                                            src={player.avatar} 
-                                                            alt={player.name}
-                                                            className="w-10 h-10 rounded-full"
-                                                        />
-                                                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></span>
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-medium text-white truncate">{player.name}</p>
-                                                        <p className="text-xs text-green-400">온라인</p>
-                                                    </div>
+                            {/* 온라인 유저만 표시 */}
+                            <div>
+                                <h4 className="text-xs font-semibold text-green-400 mb-2 uppercase">
+                                    온라인 ({onlinePlayers.length})
+                                </h4>
+                                {onlinePlayers.length === 0 ? (
+                                    <div className="text-center py-8 text-slate-500">
+                                        <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                                        <p className="text-sm">접속 중인 유저가 없습니다</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {onlinePlayers.map((player) => (
+                                            <div
+                                                key={player.id}
+                                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 transition-colors cursor-pointer"
+                                                onClick={() => handleUserClick(player)}
+                                            >
+                                                <div className="relative">
+                                                    <img
+                                                        src={player.avatar}
+                                                        alt={player.name}
+                                                        className="w-10 h-10 rounded-full"
+                                                    />
+                                                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></span>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-white truncate">{player.name}</p>
+                                                    <p className="text-xs text-green-400">온라인</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </CardContent>
                         <div className="flex-shrink-0 p-4 border-t border-slate-700">
-                            <Button 
+                            <Button
                                 variant="outline"
                                 className="w-full bg-slate-800 text-white border-slate-700 hover:bg-red-600 hover:border-red-600 hover:text-white transition-all"
                                 onClick={handleLeave}
@@ -256,7 +242,7 @@ export function LandDetail() {
                                 <CardContent>
                                     <div className="flex flex-wrap gap-2">
                                         {dummyMapInfo.resources.map((resource, index) => (
-                                            <span 
+                                            <span
                                                 key={index}
                                                 className="text-xs px-3 py-1.5 bg-slate-800 text-slate-300 rounded-full border border-slate-700"
                                             >
@@ -276,7 +262,7 @@ export function LandDetail() {
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                     {dummyMapInfo.buildings.map((building) => (
-                                        <div 
+                                        <div
                                             key={building.id}
                                             className="flex items-center justify-between p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors"
                                         >
@@ -299,8 +285,8 @@ export function LandDetail() {
                                 <CardHeader>
                                     <div className="flex items-center justify-between">
                                         <CardTitle className="text-white text-lg">유저 정보</CardTitle>
-                                        <Button 
-                                            variant="ghost" 
+                                        <Button
+                                            variant="ghost"
                                             size="icon"
                                             className="h-8 w-8 text-slate-400 hover:text-blue-400 hover:bg-slate-800"
                                             onClick={handleBackToMapInfo}
@@ -312,8 +298,8 @@ export function LandDetail() {
                                 <CardContent className="space-y-4">
                                     <div className="flex flex-col items-center gap-4 pb-4 border-b border-slate-700">
                                         <div className="relative">
-                                            <img 
-                                                src={selectedUser.avatar} 
+                                            <img
+                                                src={selectedUser.avatar}
                                                 alt={selectedUser.name}
                                                 className="w-24 h-24 rounded-full"
                                             />
@@ -372,7 +358,7 @@ export function LandDetail() {
                                         <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                                             메시지 보내기
                                         </Button>
-                                        <Button 
+                                        <Button
                                             variant="outline"
                                             className="w-full bg-slate-800 text-white border-slate-700 hover:bg-slate-700 hover:text-white"
                                         >
