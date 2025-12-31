@@ -74,7 +74,7 @@ class PlayerServiceTest {
             // given
             PlayerJoinRequest request = createPlayerJoinRequest("P_JOIN", PLAYER_ID);
 
-            when(stateManagerService.getPlayerMapOnline(MAP_ID)).thenReturn(List.of());
+            when(stateManagerService.getPlayersMapOnline(MAP_ID)).thenReturn(List.of());
             when(stateManagerService.getAllPlayerPositions(MAP_ID)).thenReturn(List.of());
 
             // when
@@ -138,7 +138,7 @@ class PlayerServiceTest {
             // given
             PlayerJoinRequest request = createPlayerJoinRequest("P_JOIN", PLAYER_ID);
 
-            when(stateManagerService.getPlayerMapOnline(MAP_ID)).thenReturn(List.of());
+            when(stateManagerService.getPlayersMapOnline(MAP_ID)).thenReturn(List.of());
             when(stateManagerService.getAllPlayerPositions(MAP_ID)).thenReturn(List.of());
 
             // when
@@ -157,7 +157,7 @@ class PlayerServiceTest {
             // given
             PlayerJoinRequest request = createPlayerJoinRequest("P_JOIN", PLAYER_ID);
 
-            when(stateManagerService.getPlayerMapOnline(MAP_ID)).thenReturn(List.of());
+            when(stateManagerService.getPlayersMapOnline(MAP_ID)).thenReturn(List.of());
             when(stateManagerService.getAllPlayerPositions(MAP_ID)).thenReturn(List.of());
 
             // when
@@ -191,7 +191,7 @@ class PlayerServiceTest {
                             .d(PlayerService.MAP_INIT_D)
                             .build());
 
-            when(stateManagerService.getPlayerMapOnline(MAP_ID)).thenReturn(playerInfoList);
+            when(stateManagerService.getPlayersMapOnline(MAP_ID)).thenReturn(playerInfoList);
             when(stateManagerService.getAllPlayerPositions(MAP_ID)).thenReturn(playerPositionList);
 
             // when

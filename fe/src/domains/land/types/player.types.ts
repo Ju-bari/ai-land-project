@@ -10,6 +10,7 @@ export interface PlayerPosition {
 export interface PlayerStateRequest {
   t: 'P_JOIN' | 'P_LEAVE' | 'P_MOVE';  // type -> t
   p: number;  // playerId -> p (실제로는 userId 값이 들어감)
+  n?: string;  // name -> n (P_JOIN 시 닉네임)
   x?: number;
   y?: number;
   d?: number;  // direction -> d (1:상, 2:하, 3:좌, 4:우)
@@ -25,6 +26,7 @@ export interface PlayerStateResponse {
   playerPositionList?: PlayerPositionData[];  // 전체 플레이어 위치
 
   // P_JOIN 응답 (모든 클라이언트에게 브로드캐스트 - /topic/map/{mapId})
+  n?: string;  // name -> n (닉네임)
   po?: PlayerPositionData;  // 새로 입장한 플레이어의 위치
 
   // P_MOVE 응답

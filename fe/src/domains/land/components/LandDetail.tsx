@@ -26,6 +26,7 @@ export function LandDetail() {
     const { isConnected, onlinePlayers, sendPositionUpdate, disconnect } = useMapWebSocket({
         mapId: Number(id),
         playerId: user?.id ?? null,
+        playerName: user?.nickname || user?.username,
     })
 
     // land가 없으면 에러 표시

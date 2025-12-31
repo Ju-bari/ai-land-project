@@ -249,7 +249,7 @@ export function PhaserMap({
         // 새로운 플레이어 생성
         const displayName = player.name && typeof player.name === 'string'
           ? player.name
-          : `Player ${player.id}`
+          : '(확인 불가)'
 
         const otherPlayer = new OtherPlayer(scene, player.id, displayName)
 

@@ -35,18 +35,6 @@ public class PlayerController {
     private final PlayerService playerService;
 
 
-//    @GetMapping(value = "/api/v1/players/maps/{mapId}",
-//            produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> InitPlayer(@PathVariable("mapId") Long mapId) {
-//        return ResponseEntity.ok(
-//                CommonResponse.<>builder()
-//                        .successOrNot(CommonConstant.YES_FLAG)
-//                        .statusCode(CommonStatus.SUCCESS)
-//                        .data(playerService.getInitPlayer(mapId))
-//                        .build());
-//    }
-
-
     // TODO: @Valid 고려
     // TODO: 보안 고려
     @MessageMapping("/map/{mapId}") // /app/map/{mapId}
@@ -54,16 +42,18 @@ public class PlayerController {
     public void updatePlayerState(@DestinationVariable("mapId") Long mapId,
                                   @Payload PlayerStateRequest playerStateRequest,
                                   SimpMessageHeaderAccessor simpMessageHeaderAccessor,
-//                                  Principal principal,
-                                  @AuthenticationPrincipal UserDetails userDetails) {
+                                  Principal principal
+//                                  @AuthenticationPrincipal UserDetails userDetails
+    ) {
         log.info("[받은 메시지] 목적지 맵 아이디  : {}", mapId);
         log.info("[받은 메시지] 보낸 유저 아이디  : {}", playerStateRequest.getPlayerId());
-        log.info("[받은 메시지] 보낸 유저 이름   : {}", userDetails.getUsername());
+        log.info("[받은 메시지] 보낸 유저 이름   : {}", principal.getName());
+//        log.info("[받은 메시지] 보낸 유저 이름   : {}", userDetails.getUsername());
         log.info("[받은 메시지] 타입           : {}", playerStateRequest.getType());
 
         playerService.handlePlayerState(simpMessageHeaderAccessor.getSessionId(),
-//                principal.getName(),
-                userDetails.getUsername(),
+                principal.getName(),
+//                userDetails.getUsername(),
                 mapId,
                 playerStateRequest);
     }

@@ -95,7 +95,7 @@ class StateManagerServiceTest {
             when(setOperations.members("map:1:players")).thenReturn(Collections.emptySet());
 
             // when
-            List<PlayerInfo> result = stateManagerService.getPlayerMapOnline(MAP_ID);
+            List<PlayerInfo> result = stateManagerService.getPlayersMapOnline(MAP_ID);
 
             // then
             assertThat(result).isEmpty();
@@ -109,7 +109,7 @@ class StateManagerServiceTest {
             when(setOperations.members("map:1:players")).thenReturn(null);
 
             // when
-            List<PlayerInfo> result = stateManagerService.getPlayerMapOnline(MAP_ID);
+            List<PlayerInfo> result = stateManagerService.getPlayersMapOnline(MAP_ID);
 
             // then
             assertThat(result).isEmpty();
@@ -136,7 +136,7 @@ class StateManagerServiceTest {
             when(hashOperations.entries("player:200:info")).thenReturn(playerData2);
 
             // when
-            List<PlayerInfo> result = stateManagerService.getPlayerMapOnline(MAP_ID);
+            List<PlayerInfo> result = stateManagerService.getPlayersMapOnline(MAP_ID);
 
             // then
             assertThat(result).hasSize(2);
@@ -157,7 +157,7 @@ class StateManagerServiceTest {
             when(hashOperations.entries("player:100:info")).thenReturn(Collections.emptyMap());
 
             // when
-            List<PlayerInfo> result = stateManagerService.getPlayerMapOnline(MAP_ID);
+            List<PlayerInfo> result = stateManagerService.getPlayersMapOnline(MAP_ID);
 
             // then
             assertThat(result).isEmpty();

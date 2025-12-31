@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -57,7 +58,7 @@ public class StateManagerService {
 
     // [플레이어 맵 온라인] 맵 온라인 플레이어 정보 제공
     // TODO: 삭제 예정 (성능 테스트 후)
-    public List<PlayerInfo> getPlayerMapOnline(Long mapId) {
+    public List<PlayerInfo> getPlayersMapOnline(Long mapId) {
         // 요청 1: 온라인 플레이어 ID 목록 조회 (Set)
         List<String> onlinePlayerIdList = getOnlinePlayerIdList(mapId);
         if (onlinePlayerIdList == null || onlinePlayerIdList.isEmpty())
@@ -137,7 +138,7 @@ public class StateManagerService {
             return new ArrayList<>();
         }
 
-        // ist 로 변환
+        // List 로 변환
         return new ArrayList<>(onlinePlayerIdSet);
     }
 
@@ -173,9 +174,9 @@ public class StateManagerService {
     public void addOrInitializePlayerPosition(Long playerId) {
         Map<String, Object> playerPosition = new HashMap<>();
         // TODO: 맵 별로 메타데이터를 만들어서 초기 스폰 장소 알고 있어야 함 + 프론트 하드코딩 말고 일관되게 해야 함
-        playerPosition.put(FIELD_X, PlayerService.MAP_INIT_X); // 맵 중앙
-        playerPosition.put(FIELD_Y, PlayerService.MAP_INIT_Y); // 맵 중앙
-        playerPosition.put(FIELD_D, PlayerService.MAP_INIT_D); // direction(상하좌우): '하'로 초기화
+        playerPosition.put(FIELD_X, String.valueOf(PlayerService.MAP_INIT_X)); // 맵 중앙
+        playerPosition.put(FIELD_Y, String.valueOf(PlayerService.MAP_INIT_Y)); // 맵 중앙
+        playerPosition.put(FIELD_D, String.valueOf(PlayerService.MAP_INIT_D)); // direction(상하좌우): '하'로 초기화
 
         String key = "player:" + playerId + ":position";
         redisTemplate.opsForHash().putAll(key, playerPosition);

@@ -17,6 +17,7 @@ const BASE_URL = import.meta.env.VITE_BACKEND_SPRING_BASE_URL || 'http://localho
 interface UseMapWebSocketProps {
   mapId: number;
   playerId: number | null;  // 실제로는 userId 값이 전달됨 (user.id), null이면 연결 안 함
+  playerName?: string;  // 유저 닉네임 (P_JOIN 시 전송)
   onPlayerJoin?: (player: OnlinePlayer) => void;
   onPlayerLeave?: (playerId: number) => void;
   onPlayerUpdate?: (player: OnlinePlayer) => void;
@@ -25,6 +26,7 @@ interface UseMapWebSocketProps {
 export function useMapWebSocket({
   mapId,
   playerId,
+  playerName,
   onPlayerJoin,
   onPlayerLeave,
   onPlayerUpdate,
@@ -69,7 +71,7 @@ export function useMapWebSocket({
       });
 
       // 2. 본인 전용 초기화 메시지 구독 (P_Init: 전체 플레이어 목록)
-      client.subscribe(`/user/queue/map/${mapId}/init`, (message: IMessage) => {
+      client.subscribe(`/user/queue/map/${mapId}`, (message: IMessage) => {
         const response: PlayerStateResponse = JSON.parse(message.body);
         handlePlayerStateResponse(response);
       });
@@ -124,6 +126,7 @@ export function useMapWebSocket({
 
   // 플레이어 상태 응답 처리
   const handlePlayerStateResponse = useCallback((response: PlayerStateResponse) => {
+    console.log('[WS] 백엔드 원본 응답:', JSON.stringify(response, null, 2));
     const { t: type, p: responsePlayerId } = response;
 
     switch (type) {
@@ -141,7 +144,7 @@ export function useMapWebSocket({
 
               const player: OnlinePlayer = {
                 id: info.playerId,
-                name: info.name || `Player ${info.playerId}`,
+                name: info.name || '(확인 불가)',
                 avatar: '/players/player1.png',
                 position: positionData ? {
                   x: positionData.x,
@@ -166,7 +169,7 @@ export function useMapWebSocket({
 
       // P_JOIN: 다른 유저가 입장했을 때
       case 'P_JOIN': {
-        const { po } = response;
+        const { po, n: playerNickname } = response;
 
         setOnlinePlayers((prev) => {
           const updated = new Map(prev);
@@ -178,7 +181,7 @@ export function useMapWebSocket({
 
           const player: OnlinePlayer = {
             id: responsePlayerId,
-            name: `Player ${responsePlayerId}`,
+            name: playerNickname || '(확인 불가)',
             avatar: '/players/player1.png',
             position: po ? {
               x: po.x,
@@ -193,7 +196,7 @@ export function useMapWebSocket({
           };
 
           updated.set(responsePlayerId, player);
-          console.log('[WS] 플레이어 입장:', responsePlayerId, '현재:', updated.size);
+          console.log('[WS] 플레이어 입장:', responsePlayerId, playerNickname, '현재:', updated.size);
 
           onPlayerJoin?.(player);
           return updated;
@@ -252,13 +255,14 @@ export function useMapWebSocket({
     const message: PlayerStateRequest = {
       t: 'P_JOIN',
       p: playerId,
+      n: playerName,  // 닉네임 전송
     };
 
     client.publish({
       destination: `/app/map/${mapId}`,
       body: JSON.stringify(message),
     });
-  }, [mapId, playerId]);
+  }, [mapId, playerId, playerName]);
 
   // P_LEAVE 메시지 전송
   const sendPlayerLeave = useCallback((client: Client) => {

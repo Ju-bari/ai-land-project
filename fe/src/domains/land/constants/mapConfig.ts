@@ -10,10 +10,10 @@ export const MAP_CONFIG = {
   tileSize: 32,
 } as const
 
-// 초기 스폰 위치 (맵 정중앙)
+// 초기 스폰 위치 (백엔드와 동일하게 설정)
 export const INITIAL_SPAWN_POSITION = {
-  x: 800,   // MAP_CONFIG.width / 2
-  y: 448,   // MAP_CONFIG.height / 2
+  x: 800,
+  y: 488,   // 백엔드 MAP_INIT_Y와 동일
   direction: 'D' as const,  // Down
 } as const
 

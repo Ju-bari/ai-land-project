@@ -12,6 +12,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class PlayerJoinResponse extends PlayerStateResponse {
 
+    @JsonProperty("n")
+    private String name;
+
     @JsonProperty("po")
     private PlayerPosition playerPosition;
 }
